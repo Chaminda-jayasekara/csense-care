@@ -10,7 +10,8 @@ export default function App() {
     spo2: 98,
     temp_c: 36.6,
     motion: 'RESTING',
-    accel_mag: 9.81
+    accel_mag: 9.81,
+    fingerDetected: true
   });
 
   useEffect(() => {
@@ -27,7 +28,8 @@ export default function App() {
             spo2: data[0].spo2,
             temp_c: data[0].temp_c,
             motion: data[0].motion,
-            accel_mag: data[0].accel_mag
+            accel_mag: data[0].accel_mag,
+            fingerDetected: data[0].finger_detected !== false
           });
         }
       });
@@ -45,7 +47,8 @@ export default function App() {
             spo2: row.spo2,
             temp_c: row.temp_c,
             motion: row.motion,
-            accel_mag: row.accel_mag
+            accel_mag: row.accel_mag,
+            fingerDetected: row.finger_detected !== false
           });
         }
       )

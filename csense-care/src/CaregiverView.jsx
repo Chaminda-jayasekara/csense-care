@@ -12,7 +12,9 @@ const TRANSLATIONS = {
     temp: "Body Temp",
     motion: "Movement Status",
     callAmbulance: "Call 1990 Suwa Seriya",
-    patchActive: "Csense Chest Patch Active"
+    patchActive: "Csense Chest Patch Active",
+    noFinger: "No finger on the heart sensor. Please place a finger on it.",
+    noReading: "NO HEART READING"
   },
   si: {
     title: "දෛනික රෝගී තත්ත්වය",
@@ -24,7 +26,9 @@ const TRANSLATIONS = {
     temp: "ශරීර උෂ්ණත්වය",
     motion: "චලනය",
     callAmbulance: "1990 සුවසැරිය අමතන්න",
-    patchActive: "පැච් උපකරණය සක්‍රියයි"
+    patchActive: "පැච් උපකරණය සක්‍රියයි",
+    noFinger: "හෘද සංවේදකය මත ඇඟිල්ලක් නැත. කරුණාකර ඇඟිල්ල තබන්න.",
+    noReading: "හෘද කියවීම නැත"
   },
   ta: {
     title: "நோயாளி தினசரி நிலை",
@@ -36,7 +40,9 @@ const TRANSLATIONS = {
     temp: "உடல் வெப்பநிலை",
     motion: "அசைவு",
     callAmbulance: "1990 சுவசரியை அழைக்கவும்",
-    patchActive: "கருவி இணைக்கப்பட்டுள்ளது"
+    patchActive: "கருவி இணைக்கப்பட்டுள்ளது",
+    noFinger: "இதய சென்சாரில் விரல் இல்லை. தயவுசெய்து விரலை வைக்கவும்.",
+    noReading: "இதய அளவீடு இல்லை"
   }
 };
 
@@ -65,6 +71,10 @@ export default function CaregiverView({ vitals }) {
     statusClass = "bg-amber-950/30 border-amber-500 text-amber-400";
     statusBadge = "bg-amber-500 text-slate-900";
     statusText = t.warning;
+  } else if (!vitals.fingerDetected) {
+    statusClass = "bg-slate-800/60 border-slate-500 text-slate-300";
+    statusBadge = "bg-slate-600 text-white";
+    statusText = t.noReading;
   }
 
   return (
@@ -95,6 +105,12 @@ export default function CaregiverView({ vitals }) {
           <p className="text-[11px] mt-3 opacity-80">{t.patchActive}</p>
         </div>
 
+        {!vitals.fingerDetected && (
+          <div className="mt-4 p-3 rounded-xl border border-amber-500 bg-amber-950/30 text-amber-300 text-xs font-medium text-center">
+            {t.noFinger}
+          </div>
+        )}
+
         <div className="grid grid-cols-2 gap-3 mt-4">
           <div className="bg-slate-800/80 p-3 rounded-xl border border-slate-700">
             <div className="flex items-center gap-1.5 text-slate-400 text-xs mb-1">
@@ -102,7 +118,7 @@ export default function CaregiverView({ vitals }) {
               <span>{t.hr}</span>
             </div>
             <p className="text-2xl font-black text-rose-400">
-              {vitals.heartRate} <span className="text-xs font-normal text-slate-400">BPM</span>
+              {vitals.fingerDetected ? vitals.heartRate : '--'} <span className="text-xs font-normal text-slate-400">BPM</span>
             </p>
           </div>
 
@@ -112,7 +128,7 @@ export default function CaregiverView({ vitals }) {
               <span>{t.spo2}</span>
             </div>
             <p className="text-2xl font-black text-sky-400">
-              {vitals.spo2} <span className="text-xs font-normal text-slate-400">%</span>
+              {vitals.fingerDetected ? vitals.spo2 : '--'} <span className="text-xs font-normal text-slate-400">%</span>
             </p>
           </div>
 

@@ -62,8 +62,8 @@ export default function ClinicianView({ vitals }) {
 
     setHistory((prev) => ({
       labels: [...prev.labels, timestamp].slice(-20),
-      hr: [...prev.hr, vitals.heartRate].slice(-20),
-      spo2: [...prev.spo2, vitals.spo2].slice(-20),
+      hr: [...prev.hr, vitals.fingerDetected ? vitals.heartRate : null].slice(-20),
+      spo2: [...prev.spo2, vitals.fingerDetected ? vitals.spo2 : null].slice(-20),
       temp: [...prev.temp, vitals.temp_c].slice(-20),
       motionMag: [...prev.motionMag, vitals.accel_mag || 9.81].slice(-20)
     }));
@@ -71,15 +71,15 @@ export default function ClinicianView({ vitals }) {
     let violated = false;
     let reasons = [];
 
-    if (vitals.spo2 > 0 && vitals.spo2 < thresholds.minSpO2) {
+    if (vitals.fingerDetected && vitals.spo2 > 0 && vitals.spo2 < thresholds.minSpO2) {
       violated = true;
       reasons.push(`SpO2 ${vitals.spo2}% (<${thresholds.minSpO2}%)`);
     }
-    if (vitals.heartRate > thresholds.maxHR) {
+    if (vitals.fingerDetected && vitals.heartRate > thresholds.maxHR) {
       violated = true;
       reasons.push(`HR ${vitals.heartRate} BPM (>${thresholds.maxHR})`);
     }
-    if (vitals.heartRate > 0 && vitals.heartRate < thresholds.minHR) {
+    if (vitals.fingerDetected && vitals.heartRate > 0 && vitals.heartRate < thresholds.minHR) {
       violated = true;
       reasons.push(`HR ${vitals.heartRate} BPM (<${thresholds.minHR})`);
     }
@@ -152,6 +152,16 @@ export default function ClinicianView({ vitals }) {
         </div>
       )}
 
+      {!vitals.fingerDetected && (
+        <div className="bg-amber-950/40 border border-amber-500 text-amber-300 p-3 rounded-xl flex items-center gap-3">
+          <AlertTriangle className="w-5 h-5 shrink-0" />
+          <div>
+            <p className="font-bold text-sm">NO FINGER DETECTED ON HEART-RATE SENSOR</p>
+            <p className="text-xs opacity-90">Heart rate and SpO2 are unavailable until the patient's finger is placed on the MAX30102 sensor.</p>
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-wrap justify-between items-center bg-slate-900 border border-slate-800 p-4 rounded-xl gap-4">
         <div>
           <h2 className="text-lg font-bold">Central Clinical Monitor</h2>
@@ -172,7 +182,7 @@ export default function ClinicianView({ vitals }) {
             <span>Heart Rate</span>
             <Heart className="w-4 h-4 text-rose-500" />
           </div>
-          <p className="text-3xl font-black text-rose-400 mt-2">{vitals.heartRate} <span className="text-xs font-normal text-slate-500">BPM</span></p>
+          <p className="text-3xl font-black text-rose-400 mt-2">{vitals.fingerDetected ? vitals.heartRate : '--'} <span className="text-xs font-normal text-slate-500">BPM</span></p>
         </div>
 
         <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
@@ -180,7 +190,7 @@ export default function ClinicianView({ vitals }) {
             <span>SpO2 Saturation</span>
             <Activity className="w-4 h-4 text-sky-500" />
           </div>
-          <p className="text-3xl font-black text-sky-400 mt-2">{vitals.spo2} <span className="text-xs font-normal text-slate-500">%</span></p>
+          <p className="text-3xl font-black text-sky-400 mt-2">{vitals.fingerDetected ? vitals.spo2 : '--'} <span className="text-xs font-normal text-slate-500">%</span></p>
         </div>
 
         <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
